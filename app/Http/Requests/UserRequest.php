@@ -8,8 +8,6 @@ class UserRequest extends FormRequest
 {
     public function rules(): array
     {
-
-        echo('rules');
         return [
             'name' => ['required'],
         ];

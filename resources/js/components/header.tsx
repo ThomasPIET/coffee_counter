@@ -29,7 +29,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                         <div>
                             <Coffee className="h-8 w-8 text-amber-600" />
                         </div>
-                        <h1 className="text-xl font-bold text-gray-900">Compteur Café</h1>
+                        <h1 className="text-xl font-bold text-gray-900">Coffee counter</h1>
                     </button>
 
                     <nav className="hidden space-x-4 md:flex">

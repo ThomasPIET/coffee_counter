@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 
@@ -16,7 +15,9 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $validatedData = $request->validated();
-        return User::create($validatedData);
+        $user =  User::create($validatedData);
+
+        return response()->json($user, 201);
     }
 
     public function show(User $user)

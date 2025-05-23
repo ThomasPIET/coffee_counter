@@ -6,44 +6,90 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import type { Player } from '@/types';
 import { Pencil, Plus, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-interface PlayerManagementProps {
-    players: Player[];
-    onAddPlayer: (player: Omit<Player, 'id'>) => void;
-    onUpdatePlayer: (player: Player) => void;
-    onDeletePlayer: (playerId: number) => void;
-}
-
-export function PlayerManagement({ players, onAddPlayer, onUpdatePlayer, onDeletePlayer }: PlayerManagementProps) {
+export default function PlayerManagement() {
+    const [players, setPlayers] = useState<Player[]>([]);
     const [newPlayerName, setNewPlayerName] = useState('');
     const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const handleAddPlayer = () => {
-        onAddPlayer({ name: newPlayerName.trim() });
-        setNewPlayerName('');
-    };
+    useEffect(() => {
+        fetch('/api/users')
+            .then((r) => r.json())
+            .then((data) => {
+                setPlayers(data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error('Failed to fetch players:', error);
+                setIsLoading(false);
+            });
+    }, []);
 
-    const handleUpdatePlayer = () => {
-        if (!editingPlayer || !editingPlayer.name.trim()) {
-            return;
+    const handleAddPlayer = async () => {
+        const name = newPlayerName.trim();
+        if (!name) return;
+
+        try {
+            const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name }),
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const json = await response.json();
+
+            const newPlayer = json.user ?? json;
+            setPlayers((prev) => [...prev, newPlayer]);
+            setNewPlayerName('');
+        } catch (err) {
+            console.error('add player failed:', err);
         }
-
-        onUpdatePlayer(editingPlayer);
-        setEditingPlayer(null);
     };
 
-    const handleDeletePlayer = (player: Player) => {
-        onDeletePlayer(player.id);
+    const handleUpdatePlayer = async () => {
+        if (!editingPlayer || !editingPlayer.name.trim()) return;
+
+        try {
+            const response = await fetch(`/api/users/${editingPlayer.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: editingPlayer.name.trim() }),
+            });
+
+            if (!response.ok) throw new Error('Failed to update player');
+
+            setPlayers((prev) => prev.map((p) => (p.id === editingPlayer.id ? { ...p, name: editingPlayer.name } : p)));
+            setEditingPlayer(null);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const getInitials = (name: string) => {
-        return name
+    const handleDeletePlayer = async (player: Player) => {
+        try {
+            const response = await fetch(`/api/users/${player.id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete player');
+
+            setPlayers((prev) => prev.filter((p) => p.id !== player.id));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getInitials = (name: string) =>
+        name
             .split(' ')
             .map((n) => n[0])
             .join('')
             .toUpperCase();
-    };
 
     return (
         <div className="space-y-6">
@@ -69,7 +115,9 @@ export function PlayerManagement({ players, onAddPlayer, onUpdatePlayer, onDelet
                     <CardTitle>Joueurs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {players.length === 0 ? (
+                    {isLoading ? (
+                        <p className="py-4 text-center">Chargement...</p>
+                    ) : players.length === 0 ? (
                         <p className="text-muted-foreground py-4 text-center">Aucun joueur enregistré</p>
                     ) : (
                         <div className="space-y-3">
