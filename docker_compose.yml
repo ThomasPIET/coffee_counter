@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: database
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - node_modules:/var/www/html/node_modules
+      - ./database/database.sqlite:/var/www/html/database/database.sqlite
+    networks:
+      - shared-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.laravel_app.rule=Host(`coffeecounter.com`)"
+      - "traefik.http.services.laravel_app.loadbalancer.server.port=80"
+      - "traefik.http.routers.laravel_app.entrypoints=websecure"
+      - "traefik.http.routers.laravel_app.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.laravel_app-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.laravel_app-http.rule=Host(`coffeecounter.com`)"
+      - "traefik.http.routers.laravel_app-http.entrypoints=web"
+      - "traefik.http.routers.laravel_app-http.middlewares=laravel_app-redirect"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: 'true'
+      APP_KEY: base64:ldphBnbR+sEY9j554P4Yx5JtEKQRXamNsUYFCBDgHB4=
+      PHP_MEMORY_LIMIT: 512M
+    depends_on:
+      - queue
+    ports:
+      - "9000:80"
+
+  queue:
+    build:
+      context: database
+      dockerfile: Dockerfile
+    container_name: laravel_queue_worker
+    restart: unless-stopped
+    command: php artisan queue:work
+    volumes:
+      - .:/var/www/html
+      - ./database/database.sqlite:/var/www/html/database/database.sqlite
+    depends_on:
+      - app
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true
+
+volumes:
+  node_modules: {}
