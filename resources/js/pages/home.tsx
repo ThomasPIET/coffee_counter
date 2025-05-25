@@ -59,10 +59,51 @@ export default function Home() {
         setCurrentPage('dashboard');
     };
 
+    const reduceDebt = async (fromPlayerId: number, toPlayerId: number) => {
+        try {
+            const response = await fetch('/api/games/reduce-debt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+                body: JSON.stringify({
+                    from_player_id: fromPlayerId,
+                    to_player_id: toPlayerId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            // Refresh games data to reflect the debt reduction
+            const gamesResponse = await fetch('/api/games');
+            if (!gamesResponse.ok) throw new Error(`HTTP ${gamesResponse.status}`);
+            const gamesData = await gamesResponse.json();
+            
+            const formattedGames = gamesData.map((game: any) => ({
+                id: game.id,
+                date: game.date,
+                coffee_count: game.coffee_count,
+                coffeeCount: game.coffee_count,
+                damage_loser_id: game.damage_loser_id,
+                damageLoserId: game.damage_loser_id,
+                concept_loser_id: game.concept_loser_id,
+                conceptLoserId: game.concept_loser_id,
+                players: game.players.map((player: any) => player.id)
+            }));
+            
+            setGames(formattedGames);
+        } catch (error) {
+            console.error('Failed to reduce debt:', error);
+        }
+    };
+
     const renderPage = () => {
         switch (currentPage) {
             case 'dashboard':
-                return <Dashboard players={players} games={games} onNavigateToAddGame={() => setCurrentPage('add-game')} />;
+                return <Dashboard players={players} games={games} onNavigateToAddGame={() => setCurrentPage('add-game')} onReduceDebt={reduceDebt} />;
             case 'add-game':
                 return <GameForm players={players} onAddGame={addGame} onCancel={() => setCurrentPage('dashboard')} />;
             case 'history':
@@ -70,7 +111,7 @@ export default function Home() {
             case 'players':
                 return <PlayerManagement />;
             default:
-                return <Dashboard players={players} games={games} onNavigateToAddGame={() => setCurrentPage('add-game')} />;
+                return <Dashboard players={players} games={games} onNavigateToAddGame={() => setCurrentPage('add-game')} onReduceDebt={reduceDebt} />;
         }
     };
 

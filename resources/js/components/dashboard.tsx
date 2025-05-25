@@ -3,16 +3,17 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DebtSummary, Game, Player } from '@/types';
-import { Coffee, Plus, TrendingUp, Users } from 'lucide-react';
+import { Coffee, Minus, Plus, TrendingUp, Users } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface DashboardProps {
     players: Player[];
     games: Game[];
     onNavigateToAddGame: () => void;
+    onReduceDebt: (fromPlayerId: number, toPlayerId: number) => Promise<void>;
 }
 
-export function Dashboard({ players, games, onNavigateToAddGame }: DashboardProps) {
+export function Dashboard({ players, games, onNavigateToAddGame, onReduceDebt }: DashboardProps) {
     const debtSummary = useMemo(() => {
         const debts: DebtSummary[] = [];
 
@@ -164,6 +165,14 @@ export function Dashboard({ players, games, onNavigateToAddGame }: DashboardProp
                                             </p>
                                         </div>
                                     </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => onReduceDebt(debt.from.id, debt.to.id)}
+                                        className="ml-4"
+                                    >
+                                        <Minus className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             ))}
                         </div>

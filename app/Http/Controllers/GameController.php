@@ -56,4 +56,26 @@ class GameController extends Controller
 
         return response()->json();
     }
+
+    public function reduceDebt()
+    {
+        $request = request();
+        $fromPlayerId = $request->input('from_player_id');
+        $toPlayerId = $request->input('to_player_id');
+
+        if (!$fromPlayerId || !$toPlayerId) {
+            return response()->json(['error' => 'Missing player IDs'], 400);
+        }
+
+        $game = Game::create([
+            'coffee_count' => 1,
+            'date' => now()->toDateString(),
+            'damage_loser_id' => $toPlayerId,
+            'concept_loser_id' => null,
+        ]);
+
+        $game->players()->sync([$fromPlayerId, $toPlayerId]);
+
+        return response()->json(['message' => 'Debt reduced successfully'], 200);
+    }
 }
