@@ -5,11 +5,14 @@ export interface Player {
 
 export interface Game {
     id?: number;
-    date?: Date;
-    coffeeCount: number;
+    date?: string;
+    coffee_count: number;
     players: number[];
-    damageLoserId: number;
-    conceptLoserId: number;
+    damage_loser_id: number | null;
+    concept_loser_id: number;
+    damageLoserId?: number | null;
+    conceptLoserId?: number;
+    coffeeCount?: number;
 }
 
 export interface DebtSummary {

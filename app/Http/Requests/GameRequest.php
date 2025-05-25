@@ -11,8 +11,10 @@ class GameRequest extends FormRequest
         return [
             'coffee_count' => ['required', 'integer'],
             'date' => ['nullable', 'date'],
-            'damage_loser_id' => ['required', 'integer'],
+            'damage_loser_id' => ['nullable', 'integer'],
             'concept_loser_id' => ['required', 'integer'],
+            'players' => ['required', 'array'],
+            'players.*' => ['integer', 'exists:users,id'],
         ];
     }
 

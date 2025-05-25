@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use Illuminate\Container\Attributes\Log;
 
 class UserController extends Controller
 {
@@ -14,6 +15,7 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
+
         $validatedData = $request->validated();
         $user =  User::create($validatedData);
 

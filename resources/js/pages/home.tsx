@@ -15,27 +15,47 @@ export default function Home() {
     const [players, setPlayers] = useState<Player[]>([]);
 
     useEffect(() => {
-        const fetchPlayers = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch('/api/users');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                return data;
+                // Fetch players
+                const playersResponse = await fetch('/api/users');
+                if (!playersResponse.ok) throw new Error(`HTTP ${playersResponse.status}`);
+                const playersData = await playersResponse.json();
+                setPlayers(playersData);
+                
+                // Fetch games
+                const gamesResponse = await fetch('/api/games');
+                if (!gamesResponse.ok) throw new Error(`HTTP ${gamesResponse.status}`);
+                const gamesData = await gamesResponse.json();
+                
+                // Transform the data to match our frontend structure
+                const formattedGames = gamesData.map((game: any) => ({
+                    id: game.id,
+                    date: game.date,
+                    coffee_count: game.coffee_count,
+                    coffeeCount: game.coffee_count, // For backward compatibility
+                    damage_loser_id: game.damage_loser_id,
+                    damageLoserId: game.damage_loser_id, // For backward compatibility
+                    concept_loser_id: game.concept_loser_id,
+                    conceptLoserId: game.concept_loser_id, // For backward compatibility
+                    players: game.players.map((player: any) => player.id)
+                }));
+                
+                setGames(formattedGames);
             } catch (error) {
-                console.error('Failed to fetch players:', error);
-                return [];
+                console.error('Failed to fetch data:', error);
             }
         };
 
-        fetchPlayers().then((data) => {
-            setPlayers(data);
-        });
+        fetchData();
     }, []);
 
     const [games, setGames] = useState<Game[]>([]);
 
     const addGame = (game: Game) => {
-        setGames((prevGames) => [...prevGames, { ...game, id: prevGames.length + 1, date: new Date() }]);
+        // The game is already saved to the database by the GameForm component
+        // Here we just update our local state
+        setGames((prevGames) => [...prevGames, game]);
         setCurrentPage('dashboard');
     };
 

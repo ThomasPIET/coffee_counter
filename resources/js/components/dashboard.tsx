@@ -17,11 +17,12 @@ export function Dashboard({ players, games, onNavigateToAddGame }: DashboardProp
         const debts: DebtSummary[] = [];
 
         games.forEach((game) => {
-            const damageLoserId = game.damageLoserId;
-            const conceptLoserId = game.conceptLoserId;
+            const damageLoserId = game.damage_loser_id !== undefined ? game.damage_loser_id : game.damageLoserId;
+            const conceptLoserId = game.concept_loser_id !== undefined ? game.concept_loser_id : game.conceptLoserId;
+            const coffeeCount = game.coffee_count !== undefined ? game.coffee_count : game.coffeeCount;
 
             game.players.forEach((playerId) => {
-                if (playerId !== damageLoserId) {
+                if (playerId !== damageLoserId && damageLoserId !== null) {
                     const from = players.find((p) => p.id === damageLoserId);
                     const to = players.find((p) => p.id === playerId);
 
@@ -46,9 +47,9 @@ export function Dashboard({ players, games, onNavigateToAddGame }: DashboardProp
                         const existingDebt = debts.find((d) => d.from.id === from.id && d.to.id === to.id);
 
                         if (existingDebt) {
-                            existingDebt.coffeeCount += game.coffeeCount;
+                            existingDebt.coffeeCount += coffeeCount;
                         } else {
-                            debts.push({ from, to, coffeeCount: game.coffeeCount });
+                            debts.push({ from, to, coffeeCount: coffeeCount });
                         }
                     }
                 }

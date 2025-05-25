@@ -9,6 +9,13 @@ class Game extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'coffee_count',
+        'date',
+        'damage_loser_id',
+        'concept_loser_id',
+    ];
+
     protected function casts(): array
     {
         return [

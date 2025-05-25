@@ -32,7 +32,7 @@ export function GameForm({ players, onAddGame, onCancel }: GameFormProps) {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (damageLoserId === null) {
             alert('Veuillez sélectionner un joueur pour le perdant au dégâts');
             return;
@@ -43,20 +43,44 @@ export function GameForm({ players, onAddGame, onCancel }: GameFormProps) {
             return;
         }
 
+        const sameLoser = damageLoserId === conceptLoserId;
+
         const newGame: Game = {
-            coffeeCount,
+            coffee_count: coffeeCount,
             players: selectedPlayers,
-            damageLoserId,
-            conceptLoserId,
+            damage_loser_id: sameLoser ? null : damageLoserId,
+            concept_loser_id: conceptLoserId,
+            date: new Date().toISOString().split('T')[0],
         };
 
-        onAddGame(newGame);
+        console.log(JSON.stringify(newGame));
 
-        setCoffeeCount(1);
-        setSelectedPlayers([]);
-        setDamageLoserId(null);
-        setConceptLoserId(null);
-        setStep(1);
+        try {
+            const response = await fetch('/api/games', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+                body: JSON.stringify(newGame),
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            
+            const savedGame = await response.json();
+            onAddGame(savedGame);
+            
+            setCoffeeCount(1);
+            setSelectedPlayers([]);
+            setDamageLoserId(null);
+            setConceptLoserId(null);
+            setStep(1);
+        } catch (error) {
+            console.error("Erreur lors de l'ajout de la partie:", error);
+            alert("Erreur lors de l'ajout de la partie. Veuillez réessayer.");
+        }
     };
 
     const nextStep = () => {
