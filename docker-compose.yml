@@ -31,10 +31,8 @@ services:
       - "traefik.http.routers.coffee-counter-insecure.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     networks:
-      - traefik
-    depends_on:
-      - traefik
+      - shared-network
 
 networks:
-  traefik:
-    external: false
+  shared-network:
+    external: true

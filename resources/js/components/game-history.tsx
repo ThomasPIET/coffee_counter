@@ -14,15 +14,17 @@ export function GameHistory({ games, players }: GameHistoryProps) {
         return player ? player.name : "Joueur inconnu"
     }
 
-    const formatDate = (date?: Date) => {
+    const formatDate = (date?: string | Date) => {
         if (!date) return "Date inconnue"
+        const dateObj = typeof date === 'string' ? new Date(date) : date
+        if (isNaN(dateObj.getTime())) return "Date inconnue"
         return new Intl.DateTimeFormat("fr-FR", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
             hour: "2-digit",
             minute: "2-digit",
-        }).format(date)
+        }).format(dateObj)
     }
 
     return (

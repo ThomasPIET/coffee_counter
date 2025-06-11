@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('coffee_count');
             $table->date('date')->nullable();
-            $table->bigInteger('damage_loser_id');
+            $table->bigInteger('damage_loser_id')->nullable();
             $table->bigInteger('concept_loser_id')->nullable();
             $table->timestamps();
         });

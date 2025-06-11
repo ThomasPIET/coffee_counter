@@ -21,8 +21,10 @@ FROM php:8.2-fpm-alpine
 # Install system dependencies and PHP extensions
 RUN apk add --no-cache \
     nginx \
+    git \
     supervisor \
     sqlite \
+    sqlite-dev \
     && docker-php-ext-install pdo pdo_sqlite
 
 # Install Composer
@@ -37,6 +39,8 @@ COPY --from=frontend-builder /app/public/build ./public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -53,7 +57,9 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Create nginx directories
-RUN mkdir -p /var/log/nginx /var/cache/nginx
+RUN mkdir -p /var/log/nginx /var/cache/nginx /var/log/supervisor /var/run
+
+RUN nginx -t
 
 # Expose port
 EXPOSE 80
