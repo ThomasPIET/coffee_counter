@@ -29,7 +29,6 @@ class GameController extends Controller
 
         $game->load('players');
 
-        Log::alert('store game 3 finished');
 
         return response()->json($game, 201);
     }

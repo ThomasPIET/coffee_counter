@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Inertia } from '@inertiajs/inertia';
 import { Coffee } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,15 +29,19 @@ export default function LoginPage() {
         }
 
         try {
-            console.log('Login attempt:', { username, password });
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
 
-            // Simulation d'une requête
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            // Redirection ou gestion du succès
-            alert('Connexion réussie!');
-        } catch (err) {
-            setError('Erreur de connexion. Veuillez réessayer.');
+            if (res.status === 200) {
+                Inertia.visit('/');
+            } else {
+                setError("Nom d'utilisateur ou mot de passe incorrect");
+            }
         } finally {
             setIsLoading(false);
         }
