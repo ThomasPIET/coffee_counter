@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\adminController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -13,4 +14,7 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('users', UserController::class);
 Route::apiResource('games', GameController::class);
+Route::apiResource( 'admins', AdminController::class);
+Route::post('auth/login', [AdminController::class, 'login']);
 Route::post('/games/reduce-debt', [GameController::class, 'reduceDebt']);
+

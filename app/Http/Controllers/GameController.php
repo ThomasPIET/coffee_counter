@@ -10,16 +10,12 @@ class GameController extends Controller
 {
     public function index()
     {
-        Log::alert('index game 1');
         return Game::with('players')->get();
     }
 
     public function store(GameRequest $request)
     {
-        Log::alert('store game 1');
         $validatedData = $request->validated();
-        Log::alert('store game 2');
-
         $game = Game::create([
             'coffee_count' => $validatedData['coffee_count'],
             'date' => $validatedData['date'] ?? now()->toDateString(),
@@ -76,6 +72,6 @@ class GameController extends Controller
 
         $game->players()->sync([$fromPlayerId, $toPlayerId]);
 
-        return response()->json(['message' => 'Debt reduced successfully'], 200);
+        return response()->json(['message' => 'Debt reduced successfully']);
     }
 }
