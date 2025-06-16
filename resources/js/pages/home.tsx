@@ -17,18 +17,15 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch players
                 const playersResponse = await fetch('/api/users');
                 if (!playersResponse.ok) throw new Error(`HTTP ${playersResponse.status}`);
                 const playersData = await playersResponse.json();
                 setPlayers(playersData);
-                
-                // Fetch games
+
                 const gamesResponse = await fetch('/api/games');
                 if (!gamesResponse.ok) throw new Error(`HTTP ${gamesResponse.status}`);
                 const gamesData = await gamesResponse.json();
-                
-                // Transform the data to match our frontend structure
+
                 const formattedGames = gamesData.map((game: any) => ({
                     id: game.id,
                     date: game.date,
@@ -38,9 +35,9 @@ export default function Home() {
                     damageLoserId: game.damage_loser_id, // For backward compatibility
                     concept_loser_id: game.concept_loser_id,
                     conceptLoserId: game.concept_loser_id, // For backward compatibility
-                    players: game.players.map((player: any) => player.id)
+                    players: game.players.map((player: any) => player.id),
                 }));
-                
+
                 setGames(formattedGames);
             } catch (error) {
                 console.error('Failed to fetch data:', error);
@@ -53,8 +50,6 @@ export default function Home() {
     const [games, setGames] = useState<Game[]>([]);
 
     const addGame = (game: Game) => {
-        // The game is already saved to the database by the GameForm component
-        // Here we just update our local state
         setGames((prevGames) => [...prevGames, game]);
         setCurrentPage('dashboard');
     };
@@ -77,11 +72,10 @@ export default function Home() {
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            // Refresh games data to reflect the debt reduction
             const gamesResponse = await fetch('/api/games');
             if (!gamesResponse.ok) throw new Error(`HTTP ${gamesResponse.status}`);
             const gamesData = await gamesResponse.json();
-            
+
             const formattedGames = gamesData.map((game: any) => ({
                 id: game.id,
                 date: game.date,
@@ -91,9 +85,9 @@ export default function Home() {
                 damageLoserId: game.damage_loser_id,
                 concept_loser_id: game.concept_loser_id,
                 conceptLoserId: game.concept_loser_id,
-                players: game.players.map((player: any) => player.id)
+                players: game.players.map((player: any) => player.id),
             }));
-            
+
             setGames(formattedGames);
         } catch (error) {
             console.error('Failed to reduce debt:', error);

@@ -58,14 +58,14 @@ class adminController extends Controller
         alert('login attempt');;
 
         if ($user && Hash::check($credentials['password'], $user->password)) {
-            Auth::guard('web')->login($user);
+            Auth::guard('web')->login($user,true);
             alert('login attempt');;
 
             $request->session()->regenerate();
             alert('login attempt');;
 
             if (Auth::check()) {
-                alert('User authenticated');
+                alert('User authenticatedq');
                 alert('login attempt');;
 
             } else {
@@ -74,8 +74,7 @@ class adminController extends Controller
 
             alert('login successful final');
 
-            return response()->json(['message' => 'Login successful'])
-                ->cookie('laravel_session', $request->session()->getId(), 120, '/', null, false, true);
+            return response()->json(['message' => 'Login successful']);
         } else {
             alert('login attempt');;
 
