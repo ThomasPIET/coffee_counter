@@ -48,6 +48,36 @@ Ce projet m’a permis de :
 
 ---
 
+## ⚙️ Installation et lancement
+
+> Prérequis : Docker et Docker Compose installés sur la machine.
+
+1. **Cloner le dépôt**
+   ```bash
+   git clone https://github.com/ThomasPIET/coffee_counter.git
+   cd coffee_counter
+    ```
+   
+2. **Configurer l’environnement**
+
+Copier .env.example en .env dans /backend et /frontend
+
+Adapter les paramètres de connexion à la base de données si nécessaire
+
+3. **Lancer le projet**
+
+```bash
+docker-compose up -d
+```
+
+4. **Accéder à l’application**
+
+Frontend React : http://localhost
+
+API Laravel : http://localhost/api
+
+
+
 ## 🔮 Perspectives
 
 - Ajout de rôles utilisateurs
